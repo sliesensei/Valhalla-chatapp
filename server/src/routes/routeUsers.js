@@ -4,7 +4,6 @@ import {
     addNewUser,
     updateUsers,
     deleteUsers,
-    addOAuth
 } from '../controller/controllerUsers';
 
 const routeUsers = (app) => {
@@ -41,8 +40,6 @@ const routeUsers = (app) => {
          * @apiSuccess (201) {String} password Password of the user.
          */
       .post(addNewUser);
-    app.route('/users/oauth/:id')
-        .put(addOAuth);
     app.route('/users/:id')
       /**
        * @api {get} /user/:id Request a user with id

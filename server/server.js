@@ -1,5 +1,6 @@
 import routeUsers from './src/routes/routeUsers';
 import routeLogin from './src/routes/routeLogin';
+import routeConfirmation from "./src/routes/routeConfirmation";
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -33,6 +34,7 @@ const connectWithRetry = () => {
 connectWithRetry();
 routeUsers(app);
 routeLogin(app);
+routeConfirmation(app);
 
 app.listen(port, function() {
 	console.log("Mon serveur fonctionne sur http://localhost:" +port +"\n");

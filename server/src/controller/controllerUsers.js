@@ -1,7 +1,11 @@
 import mongoose from 'mongoose';
 import schemaUsers from '../models/modelUsers';
+import schemaConfirmation from "../models/modelConfirmation";
+
+var crypto = require('crypto');
 
 const Users = mongoose.model('Users', schemaUsers);
+const Confirmations = mongoose.model('Confirmations', schemaConfirmation);
 
 export function getUsers(req, res) {
 	Users.find({}, (err, user) => {
@@ -32,20 +36,30 @@ export function addNewUser(req, res) {
 			return res.status(400).send('That user already exists!');
 		} else {
 			users = new Users();
+			let confirmation = new Confirmations();
 
 			users.firstName = req.body.firstName;
 			users.lastName = req.body.lastName;
 			users.email = req.body.email;
+			users.username = req.body.username;
+			users.confirmed = false;
 			users.setPassword(req.body.password);
-		}
 
-		users.save((err) => {
-			if (err) {
-				res.status(400).send(err);
-			} else {
-				res.status(201).json(users);
-			}
-		});
+			users.save((err) => {
+				if (err) {
+					return res.status(400).send(err);
+				}
+				confirmation.user = users._id;
+				confirmation.code = crypto.randomBytes(25).toString('hex');
+
+				confirmation.save((err) => {
+					if (err) {
+						return res.status(400).send(err);
+					}
+					return res.status(201).json(users);
+				})
+			});
+		}
 	});
 }
 

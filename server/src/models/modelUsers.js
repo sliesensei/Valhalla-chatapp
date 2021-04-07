@@ -2,46 +2,10 @@ const mongoose = require('mongoose');
 var crypto = require('crypto');
 const {Schema} = mongoose;
 
-const Spotify = new Schema({
-	spotifyClientId: {},
-	spotifygoogleClientSecret: {},
-	spotifyId: {},
-	spotifyAccessToken: {},
-	spotifyRefreshToken: {}
-});
-
-const Google = new Schema({
-	googleClientId: {},
-	googleClientSecret: {},
-	googleId: {},
-	googleAccessToken: {},
-	googleRefreshToken: {}
-});
-
-const Imgur = new Schema({
-	imgurClientId: {},
-	imgurClientSecret: {},
-	imgurId: {},
-	imgurAccessToken: {},
-	imgurRefreshToken: {}
-});
-
-export const OAuth = new Schema({
-	clientId: {},
-	clientSecret: {},
-	id: {},
-	accessToken: {},
-	refreshToken: {},
-	expiryDate: {}
-});
-
 const schemaUsers = new Schema({
 	firstName: {type: String},
 	lastName: {type: String},
 	email: {type: String, required: true},
-	imgur: {type: OAuth},
-	google: {type: OAuth},
-	spotify: {type: OAuth},
 	hash: String,
 	salt: String,
 }, {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}, strict: false});

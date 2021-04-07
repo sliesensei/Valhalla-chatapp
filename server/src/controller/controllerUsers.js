@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import schemaUsers, {OAuth} from '../models/modelUsers';
+import schemaUsers from '../models/modelUsers';
 
 const Users = mongoose.model('Users', schemaUsers);
 
@@ -61,32 +61,6 @@ export function updateUsers(req, res) {
 			}
 		});
 }
-
-export function addOAuth(req, res) {
-	const auth = mongoose.model(req.body.service, OAuth);
-	let newAuth = new auth();
-	newAuth.accessToken = req.body.accessToken;
-	newAuth.refreshToken = req.body.refreshToken;
-	newAuth.expiryDate = req.body.expiryDate;
-	newAuth.clientId = req.body.clientId;
-	newAuth.clientSecret = req.body.clientSecret;
-	newAuth.id = req.body.id;
-	let update = {
-		[req.body.service]: newAuth
-	};
-
-	Users.findOneAndUpdate({_id: req.params.id}, update, {new: true},
-		(error, users) => {
-			if (error) {
-				res.status(400).json(error);
-			} else if (users === null) {
-				res.status(400).json({error: 'Server was unable to find this user'});
-			} else {
-				res.status(200).json(users);
-			}
-		});
-}
-
 
 export function deleteUsers(req, res) {
 	Users.deleteOne({_id: req.params.id}, (error, users) => {

@@ -4,9 +4,13 @@ import {
     addNewUser,
     updateUsers,
     deleteUsers,
+    getMe
 } from '../controller/controllerUsers';
+import auth from '../middleware/auth';
 
 const routeUsers = (app) => {
+    app.route('/me')
+        .get(auth, getMe)
     app.route('/users')
       /**
        * @api {get} /users/ Get all users

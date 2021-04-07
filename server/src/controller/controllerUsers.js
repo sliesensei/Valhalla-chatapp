@@ -7,6 +7,10 @@ var crypto = require('crypto');
 const Users = mongoose.model('Users', schemaUsers);
 const Confirmations = mongoose.model('Confirmations', schemaConfirmation);
 
+export function getMe(req, res) {
+	res.status(200).json(req.user)
+}
+
 export function getUsers(req, res) {
 	Users.find({}, (err, user) => {
 		if (err) {

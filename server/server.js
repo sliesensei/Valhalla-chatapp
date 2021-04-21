@@ -12,6 +12,10 @@ var bodyParser = require('body-parser');
 var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
 const options = {
 	useNewUrlParser: true
 };
@@ -36,13 +40,30 @@ routeUsers(app);
 routeLogin(app);
 routeConfirmation(app);
 
-app.listen(port, function() {
+server.listen(port, function() {
 	console.log("Mon serveur fonctionne sur http://localhost:" +port +"\n");
 });
 
+/*
 app.route('/')
 .get(function(req, res) {
 	res.status(200).json();
+});
+*/
+
+app.get('/', (req, res) => {
+	res.sendFile(__dirname + '/msg.html');
+});
+
+io.on('connection', (socket) => {
+	console.log('a user connected');
+	socket.on('disconnect', () => {
+		console.log('user disconnected');
+	});
+	socket.on('chat message', (msg) => {
+		io.emit('chat message', msg);
+		console.log('message: ' + msg);
+	});
 });
 
 module.exports = app;

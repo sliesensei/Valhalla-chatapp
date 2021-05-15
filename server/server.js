@@ -17,6 +17,7 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 const options = {
+	useCreateIndex: true,
 	useNewUrlParser: true
 };
 

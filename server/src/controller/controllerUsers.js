@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import schemaUsers from '../models/modelUsers';
 import schemaConfirmation from "../models/modelConfirmation";
+const nodemailer = require("../../config/nodemailer.config");
+
 
 var crypto = require('crypto');
 
@@ -53,13 +55,17 @@ export function addNewUser(req, res) {
 				if (err) {
 					return res.status(400).send(err);
 				}
-				confirmation.user = users._id;
-				confirmation.code = crypto.randomBytes(25).toString('hex');
-
-				confirmation.save((err) => {
-					if (err) {
-						return res.status(400).send(err);
-					}
+					confirmation.user = users._id;
+					confirmation.code = crypto.randomBytes(25).toString('hex');
+					confirmation.save((err) => {
+						if (err) {
+							return res.status(400).send(err);
+						}
+						nodemailer.sendConfirmationEmail(
+							users.username,
+							users.email,
+							confirmation.code
+						);
 					return res.status(201).json(users);
 				})
 			});

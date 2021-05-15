@@ -1,6 +1,7 @@
 import routeUsers from './src/routes/routeUsers';
 import routeLogin from './src/routes/routeLogin';
 import routeConfirmation from "./src/routes/routeConfirmation";
+import routeRooms from "./src/routes/routeRooms";
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -36,6 +37,7 @@ connectWithRetry();
 routeUsers(app);
 routeLogin(app);
 routeConfirmation(app);
+routeRooms(app);
 
 server.listen(port, function() {
 	console.log("Mon serveur fonctionne sur http://localhost:" +port +"\n");
@@ -53,14 +55,7 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-	console.log('a user connected');
-	socket.on('disconnect', () => {
-		console.log('user disconnected');
-	});
-	socket.on('chat message', (msg) => {
-		io.emit('chat message', msg);
-		console.log('message: ' + msg);
-	});
+
 });
 
 module.exports = app;

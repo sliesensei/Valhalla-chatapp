@@ -55,24 +55,17 @@ export function addNewUser(req, res) {
 				if (err) {
 					return res.status(400).send(err);
 				}
-				// res.send({
-					// 	message:
-					// 	  "User was registered successfully! Please check your email",
-					//  });
 					confirmation.user = users._id;
 					confirmation.code = crypto.randomBytes(25).toString('hex');
-					console.log(confirmation.code);
 					confirmation.save((err) => {
 						if (err) {
 							return res.status(400).send(err);
 						}
-						console.log(confirmation.code);
 						nodemailer.sendConfirmationEmail(
 							users.username,
 							users.email,
 							confirmation.code
 						);
-						console.log('azea');
 					return res.status(201).json(users);
 				})
 			});

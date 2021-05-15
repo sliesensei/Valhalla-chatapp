@@ -14,36 +14,6 @@
         #messages > li { padding: 0.5rem 1rem; }
         #messages > li:nth-child(odd) { background: #efefef; }
 	</style>
-	<script src="/socket.io/socket.io.js"></script>
-	<script>
-		var socket = io();
-
-		var messages = document.getElementById('messages');
-		var form = document.getElementById('form');
-		var input = document.getElementById('input');
-		var btn = document.getElementById("myBtn");
-
-		form.addEventListener('submit', function(e) {
-			e.preventDefault();
-			if (input.value) {
-				socket.emit('chat message', input.value);
-				input.value = '';
-			}
-		});
-
-		btn.addEventListener('click', function (e) {
-			if (input.value) {
-				socket.emit('chat message', input.value);
-				input.value = '';
-			}
-		})
-		socket.on('chat message', function(msg) {
-			var item = document.createElement('li');
-			item.textContent = msg;
-			messages.appendChild(item);
-			window.scrollTo(0, document.body.scrollHeight);
-		});
-	</script>
 </head>
 <body>
 <ul id="messages"></ul>
@@ -51,5 +21,30 @@
 	<input id="input" autocomplete="off" />
 	<button id="myBtn" type="submit">Send</button>
 </form>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+	var socket = io();
+
+	var messages = document.getElementById('messages');
+	var form = document.getElementById('form');
+	var input = document.getElementById('input');
+	var btn = document.getElementById("myBtn");
+	console.log(form)
+
+	form.addEventListener('submit', function(e) {
+		e.preventDefault();
+		if (input.value) {
+			socket.emit('chat message', input.value);
+			input.value = '';
+		}
+	});
+
+	socket.on('chat message', function(msg) {
+		var item = document.createElement('li');
+		item.textContent = msg;
+		messages.appendChild(item);
+		window.scrollTo(0, document.body.scrollHeight);
+	});
+</script>
 </body>
 </html>

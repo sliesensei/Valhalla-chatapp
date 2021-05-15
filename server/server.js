@@ -5,7 +5,6 @@ import routeConfirmation from "./src/routes/routeConfirmation";
 const dotenv = require('dotenv');
 dotenv.config();
 const config = require('config');
-const passport = require('passport');
 
 var port = 8080;
 var bodyParser = require('body-parser');
@@ -20,8 +19,6 @@ const options = {
 	useNewUrlParser: true
 };
 
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(bodyParser.urlencoded({	extended: true}));
 app.use(bodyParser.json());
 

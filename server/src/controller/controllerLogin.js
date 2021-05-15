@@ -23,8 +23,7 @@ export function Login(req, res) {
 		} else {
 			if (user.validPassword(req.body.password)) {
 				const payload = {
-					id: user.id,
-					email: user.email
+					id: user._id
 				};
 				jwt.sign(payload, config.JWT_SECRET, {expiresIn: 3600},
 					(err, token) => {

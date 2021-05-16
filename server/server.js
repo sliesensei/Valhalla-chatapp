@@ -2,6 +2,7 @@ import routeUsers from './src/routes/routeUsers';
 import routeLogin from './src/routes/routeLogin';
 import routeConfirmation from "./src/routes/routeConfirmation";
 import routeRooms from "./src/routes/routeRooms";
+import routeInvitations from "./src/routes/routeInvitations";
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -39,6 +40,7 @@ routeUsers(app);
 routeLogin(app);
 routeConfirmation(app);
 routeRooms(app);
+routeInvitations(app);
 
 server.listen(port, function() {
 	console.log("Mon serveur fonctionne sur http://localhost:" +port +"\n");

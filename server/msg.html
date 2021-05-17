@@ -23,7 +23,7 @@
 </form>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-	var socket = io();
+	var socket = io.connect('', {query: 'id=609fee494f22012cbfe3b6b2'});
 
 	var messages = document.getElementById('messages');
 	var form = document.getElementById('form');
@@ -34,14 +34,14 @@
 	form.addEventListener('submit', function(e) {
 		e.preventDefault();
 		if (input.value) {
-			socket.emit('chat message', input.value);
+			socket.emit('message', "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOWZlZTQ5NGYyMjAxMmNiZmUzYjZiMiIsImlhdCI6MTYyMTI3OTE5MSwiZXhwIjoxNjIxMjgyNzkxfQ.-cFGfa2H-2NLmZL1mDToAjyW_q9Eczyv3_d34Os0A1w", "609ff7c5c4c6545ae6768b78", input.value);
 			input.value = '';
 		}
 	});
 
-	socket.on('chat message', function(msg) {
+	socket.on('message', function(user, room, message) {
 		var item = document.createElement('li');
-		item.textContent = msg;
+		item.textContent = "message from " + user + ". Room : " + room + ". Message = " + message;
 		messages.appendChild(item);
 		window.scrollTo(0, document.body.scrollHeight);
 	});

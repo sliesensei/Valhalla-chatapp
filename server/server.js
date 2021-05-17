@@ -1,8 +1,5 @@
-import routeUsers from './src/routes/routeUsers';
-import routeLogin from './src/routes/routeLogin';
-import routeConfirmation from "./src/routes/routeConfirmation";
-import routeRooms from "./src/routes/routeRooms";
-import routeInvitations from "./src/routes/routeInvitations";
+import {applyRoutes} from "./src/helpers";
+import setupSocket from "./src/socket";
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -36,29 +33,16 @@ const connectWithRetry = () => {
 };
 
 connectWithRetry();
-routeUsers(app);
-routeLogin(app);
-routeConfirmation(app);
-routeRooms(app);
-routeInvitations(app);
+applyRoutes(app);
 
 server.listen(port, function() {
 	console.log("Mon serveur fonctionne sur http://localhost:" +port +"\n");
 });
 
-/*
-app.route('/')
-.get(function(req, res) {
-	res.status(200).json();
-});
-*/
-
 app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/msg.html');
 });
 
-io.on('connection', (socket) => {
-
-});
+setupSocket(io);
 
 module.exports = app;

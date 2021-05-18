@@ -25,3 +25,28 @@ module.exports.sendConfirmationEmail = (name, email, confirmationCode) => {
         </div>`,
   }).catch(err => console.log(err));
 };
+
+module.exports.forgotPassword = (name, email, resetLink) => {
+  transport.sendMail({
+    from: user,
+    to: email,
+    subject: "Forgot password",
+    html: `<h1>Forgot Password</h1>
+        <h2>Hello ${name}</h2>
+        <p>Clicker here to reset your password</p>
+        <a href=${resetLink}> Click here</a>
+        </div>`,
+  }).catch(err => console.log(err));
+};
+
+module.exports.passwordResetSuccessFully = (name, email) => {
+  transport.sendMail({
+    from: user,
+    to: email,
+    subject: "Password changed successfully",
+    html: `<h1>Password Confirmation</h1>
+        <h2>Hello ${name}</h2>
+        <p>Password reset successfully</p>
+        </div>`,
+  }).catch(err => console.log(err));
+};

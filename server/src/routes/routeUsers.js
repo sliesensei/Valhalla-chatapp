@@ -4,7 +4,9 @@ import {
     addNewUser,
     updateUsers,
     deleteUsers,
-    getMe
+    getMe,
+    requestPasswordReset,
+    resetPassword
 } from '../controller/controllerUsers';
 import auth from '../middleware/auth';
 
@@ -92,6 +94,10 @@ const routeUsers = (app) => {
          * @apiSuccess (200) {Number} ok Delete is ok.
          */
       .delete(deleteUsers);
+    app.route('/request/')
+      .post(requestPasswordReset);
+    app.route('/reset/:token')
+      .post(resetPassword);
 }
 
 export default routeUsers;

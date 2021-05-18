@@ -1,12 +1,15 @@
 import mongoose from 'mongoose';
 import schemaUsers from '../models/modelUsers';
 import schemaConfirmation from "../models/modelConfirmation";
+import schemaToken from "../models/modelToken";
+
 const nodemailer = require("../../config/nodemailer.config");
 
 
 var crypto = require('crypto');
 
 const Users = mongoose.model('Users', schemaUsers);
+const Token = mongoose.model('Token', schemaToken);
 const Confirmations = mongoose.model('Confirmations', schemaConfirmation);
 
 export function getMe(req, res) {
@@ -97,3 +100,59 @@ export function deleteUsers(req, res) {
 		}
 	});
 }
+
+export async function requestPasswordReset(req, res) {
+    const user = await Users.findOne({ email: req.body.email });
+
+    if (!user) {
+        throw new Error("User does not exist"); 
+    }
+    let token = new Token();
+    if (token) 
+        await token.deleteOne();
+
+    token.user = user._id;
+    token.token = crypto.randomBytes(25).toString('hex');
+    token.save((err) => {
+        if (err) {
+            return res.status(400).send(err);
+        }
+        const link = `http://localhost:8080/passwordReset?token=${token}&id=${user._id}`;
+        nodemailer.forgotPassword(
+            user.username,
+            user.email,
+            link
+        );
+        return res.status(201).json(token);
+    })
+}
+
+
+export function resetPassword(req, res) {
+    Token.findOne({token: req.params.token}, (error, token) => {
+            if (!token) {
+                res.status(400).json(error, 'Token not found');
+            } else {
+                Users.findOneAndUpdate({_id: token.user}, {}, {},
+                    (error, user) => {
+						console.log(user);
+                        if (error || user === null) {
+							res.status(400).json(error);
+                        } else {
+							user.setPassword(req.body.password);
+							user.save((err) => {
+								if(err) {
+									res.status(500).send(err);
+								} else {
+									nodemailer.passwordResetSuccessFully(
+										user.username,
+										user.email,
+									);
+									return res.status(200).send({ user })
+								}
+							})
+                        }
+                    });
+            }
+        });
+};

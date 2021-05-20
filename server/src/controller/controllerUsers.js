@@ -105,7 +105,7 @@ export async function requestPasswordReset(req, res) {
 	const user = await Users.findOne({ email: req.body.email });
 
 	if (!user) {
-		throw new Error("User does not exist");
+		return res.status(404).json({ message: "User does not exist" })
 	}
 	let token = new Token();
 	if (token)
@@ -117,13 +117,13 @@ export async function requestPasswordReset(req, res) {
 		if (err) {
 			return res.status(400).send(err);
 		}
-		const link = `http://localhost:8080/passwordReset?token=${token}&id=${user._id}`;
+		const link = `http://localhost:3000/passwordReset/${token.token}?id=${user._id}`;
 		nodemailer.forgotPassword(
 			user.username,
 			user.email,
 			link
 		);
-		return res.status(201).json(token);
+		return res.status(201).json({ message: 'A link has been sent to your email !' });
 	})
 }
 

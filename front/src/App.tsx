@@ -10,6 +10,8 @@ import withContext from './hooks/withContext';
 import Confirmation from './pages/confirmation';
 import { SnackbarProvider } from 'notistack';
 import chats from './pages/chats';
+import Reset from './pages/reset';
+import ResetPassword from './pages/passwordReset';
 
 function App() {
   const { currentTheme } = useContext(GlobalContext)
@@ -20,10 +22,9 @@ function App() {
           <Switch>
             <Route path='/home' component={home} />
             <Route path="/confirmations/:token" component={Confirmation} />
-            <Route path='/login' />
-            <Route path='/logout' />
-            <Route path='/chats/:id' />
             <Route path='/chats' component={chats} />
+            <Route path='/reset' component={Reset} />
+            <Route path='/passwordReset/:token' component={ResetPassword} />
             <Redirect to='/home' />
           </Switch>
         </BrowserRouter>

@@ -2,7 +2,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, makeStyles, 
 import { sha256 } from "js-sha256";
 import { useSnackbar } from "notistack";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { useHistory } from "react-router";
+import { useHistory, useParams, useLocation } from "react-router";
 import server from "../sockets/useServer";
 
 const useStyles = makeStyles((theme) => ({
@@ -24,14 +24,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 class Form {
-  username?: string
   password?: string
+  cpassword?: string
 }
 
-export default function Signin() {
+export default function ResetPassword() {
   const history = useHistory();
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const classes = useStyles();
+  const { token } = useParams<{ token: string }>();
   const [form, setForm] = useState(new Form())
   const { enqueueSnackbar } = useSnackbar()
 
@@ -49,34 +50,30 @@ export default function Signin() {
   }, [dialogOpen])
 
   const handleSubmit = useCallback(() => {
-    const { password, username } = form;
-    if (username && password) {
-      server.signin({ username, password: sha256(password) })
+    const { password, cpassword } = form;
+    if (cpassword && password && password.length && cpassword === password) {
+      server.resetPassword(token, sha256(password))
         .then(({ data, variant, ...rest }: any) => {
           console.log(data, rest)
           enqueueSnackbar(data?.message, { variant });
           if (variant === 'success') {
-            history.push('/chats')
+            history.push('/')
           }
         })
     }
-  }, [enqueueSnackbar, form, history]);
+  }, [enqueueSnackbar, form, history, token]);
 
   return (
-    <>
-      <Button variant="contained" color="primary" onClick={() => setDialogOpen(prev => !prev)}>Sign in</Button>
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle title="Sign In" className={classes.title}>Sign In</DialogTitle>
-        <DialogContent className={classes.content}>
-          <TextField fullWidth label="Username or email" name="username" onChange={handleChange} />
-          <TextField fullWidth label="Password" type="password" name="password" onChange={handleChange} />
-          <Link className={classes.reset} href='/reset' title="Forget your password ?">Forget your password ?</Link>
-        </DialogContent>
-        <DialogActions>
-          <Button color="default" onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button color="primary" onClick={handleSubmit}>Sign In</Button>
-        </DialogActions>
-      </Dialog>
-    </>
+    <Dialog open maxWidth="xs" fullWidth>
+      <DialogTitle title="Sign In" className={classes.title}>Password reset</DialogTitle>
+      <DialogContent className={classes.content}>
+        <TextField fullWidth label="Password" type="password" name="cpassword" onChange={handleChange} />
+        <TextField fullWidth label="ConfirmPassword" type="password" name="password" onChange={handleChange} />
+      </DialogContent>
+      <DialogActions>
+        <Button color="default" onClick={() => history.push('/')}>Cancel</Button>
+        <Button color="primary" onClick={handleSubmit}>Sign In</Button>
+      </DialogActions>
+    </Dialog>
   )
 }

@@ -46,7 +46,7 @@ export default function Invites({ dialogOpen, onClose, invites }: Props) {
       open={dialogOpen}
       maxWidth="md"
     >
-      <DialogTitle title="Invitation" className={classes.dialogTitle}>Chat Settings</DialogTitle>
+      <DialogTitle title="Invitation" className={classes.dialogTitle}>Mange Invitations</DialogTitle>
       <DialogContent className={classes.dialogContent}>
         {invites.map((invite) =>
         (<div className={classes.contentSection}>

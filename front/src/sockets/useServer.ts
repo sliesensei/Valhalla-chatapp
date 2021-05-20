@@ -61,6 +61,10 @@ class Server {
     return { data, ...rest };
   }
 
+  async resetPassword(token: string, password: string) {
+    return this.post('/reset/' + token, { password });
+  }
+
   get invites() {
     const { post, get } = this;
     return {
@@ -96,6 +100,10 @@ class Server {
         return post('/invite', { roomId, username })
       }
     }
+  }
+
+  reset(email: string) {
+    return this.post('/request', { email })
   }
 
   get rooms() {

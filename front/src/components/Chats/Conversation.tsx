@@ -107,7 +107,7 @@ export default function Conversation({ chat }: Props) {
   }, [])
 
   const handleSend = useCallback(() => {
-    socket.send(chat._id, message);
+    socket?.send(chat._id, message);
   }, [chat._id, message, socket])
 
   useEffect(() => {
@@ -121,11 +121,11 @@ export default function Conversation({ chat }: Props) {
   }, [chat._id])
 
   useEffect(() => {
-    socket.onMessage(handleMessageReceive);
+    socket?.onMessage(handleMessageReceive);
     return () => {
-      socket.offMessage(handleMessageReceive);
+      socket?.offMessage(handleMessageReceive);
     }
-  })
+  }, [handleMessageReceive, socket])
 
   const handleChangeMessage = useCallback((value) => {
     setMessage(value);

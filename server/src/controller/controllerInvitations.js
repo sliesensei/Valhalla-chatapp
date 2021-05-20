@@ -25,24 +25,27 @@ export async function invite(req, res) {
 	if (user._id.toString() === req.user._id.toString()) return res.status(403).json({ message: "Please don't invite yourself." })
 	if (!user) return res.status(404).json({ message: "Invalid user." });
 	if (!room) return res.status(404).json({ message: "Invalid room." });
-	if (room.members.includes(user._id)) return res.status(403).json({ error: "User already joined this room." });
+	if (room.members.includes(user._id)) return res.status(403).json({ message: "User already joined this room." });
+	const invite = await Invitations.findOne({ room: req.body.roomId, user: user._id })
+	if (invite) return res.status(403).json({ message: "User already invited" });
 
 	let invitation = new Invitations({
 		roomName: room.name,
-		userName: user.username,
+		userName: req.user.username,
 		token: crypto.randomBytes(25).toString('hex'),
 		room: req.body.roomId,
 		user: user._id,
 	});
 
-	const socket = useGlobalSocket();
-	if (socket) {
-		socket.emit('invite');
+	const { globalSocket, users } = useGlobalSocket();
+	console.log('users', users);
+	if (globalSocket) {
+		globalSocket.to(users[user._id.toString()]).emit('invite');
 	}
 
 	//TODO: Envoyer un mail
 	invitation = await invitation.save();
-	return res.status(201).json(invitation);
+	return res.status(201).json({ message: "Succesfuly sent invitation", ...invitation });
 }
 
 export async function accept(req, res) {
@@ -56,5 +59,5 @@ export async function accept(req, res) {
 	room.members.push(req.user._id);
 	room = await room.save();
 	await Invitations.deleteOne({ _id: invitation._id });
-	return res.status(201).json(room);
+	return res.status(201).json({ message: 'Successfully joined room', ...room });
 }

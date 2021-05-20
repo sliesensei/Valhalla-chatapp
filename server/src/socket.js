@@ -14,7 +14,7 @@ let users = {};
 let globalSocket;
 
 export function useGlobalSocket() {
-	return globalSocket;
+	return { globalSocket, users };
 }
 
 const setupSocket = (io) => {
@@ -22,6 +22,16 @@ const setupSocket = (io) => {
 	io.on('connection', (socket) => {
 		users[socket.handshake.query.id] = socket.id;
 		console.log(users);
+
+		socket.on('signin', (userId, disconnect) => {
+			delete users[socket.handshake.query.id];
+			if (disconnect) {
+				delete users[userId];
+			}
+			else {
+				users[userId] = socket.id;
+			}
+		})
 
 		socket.on('message', async (token, roomId, messageContent) => {
 			try {

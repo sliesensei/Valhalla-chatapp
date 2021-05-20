@@ -1,4 +1,5 @@
 import axios from "axios";
+import useSocket from "./useSocket";
 
 class Server {
 
@@ -55,6 +56,8 @@ class Server {
     const { data, ...rest } = await this.post('/login', credentials);
     localStorage.setItem('userToken', data?.token);
     localStorage.setItem('userId', data?.userId);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useSocket().signin(data?.userId);
     return { data, ...rest };
   }
 

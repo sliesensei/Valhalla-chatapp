@@ -17,6 +17,7 @@ import withContainer from '../hooks/withContainer';
 import server from '../sockets/useServer';
 import { useSnackbar } from 'notistack';
 import { useHistory } from 'react-router';
+import useSocket from '../sockets/useSocket';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -83,8 +84,10 @@ function Chats() {
   const [data, setData] = useState<Array<any>>([]);
   const [currentChat, setCurrentChat] = useState<any>()
   const [filtered, setFiltered] = useState<Array<any>>([]);
+  const [notifs, setNotifs] = useState<{ [k: string]: number }>({});
   const history = useHistory();
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const socket = useSocket();
   // const { enqueueSnackbar } = useSnackbar()
   const [form, setForm] = useState(new Form())
   const handleChange = useCallback(({ target: { name, value } }: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -113,7 +116,26 @@ function Chats() {
     })
   }, []);
 
+  const handleAddNotif = useCallback((newMessage) => {
+    console.log(newMessage)
+    if (newMessage.room !== currentChat?._id) {
+      setNotifs(prev => ({
+        ...prev, [newMessage.room]: (prev[newMessage.room] ?? 0) + 1,
+      }))
+    }
+  }, [currentChat])
+
   useEffect(() => {
+    socket?.onMessage(handleAddNotif);
+    return () => {
+      socket?.offMessage(handleAddNotif);
+    }
+  }, [handleAddNotif, socket])
+
+  useEffect(() => {
+    if (currentChat) {
+      setNotifs(prev => ({ ...prev, [currentChat._id]: 0 }))
+    }
   }, [currentChat]);
 
   useEffect(() => {
@@ -151,6 +173,7 @@ function Chats() {
         <ConversationList>
           {filtered.map((chat: any) => (
             <ConversationPreview
+              unreadCnt={notifs[chat._id]}
               onClick={handleChangeCurrentChat(chat)}
               key={chat._id}
               className={classes.conversationPreview}

@@ -4,6 +4,7 @@ import { FunctionComponent, useCallback, useEffect, useState } from "react"
 import { useHistory } from "react-router"
 import Invites from "../components/Chats/Invites"
 import server from "../sockets/useServer"
+import useSocket from "../sockets/useSocket"
 
 const useStyles = makeStyles((theme: Theme) => {
   console.log(theme)
@@ -33,14 +34,23 @@ export default function withContainer<T>(Component: FunctionComponent<T>) {
   return (props: T) => {
     const classes = useStyles();
     const history = useHistory();
+    const socket = useSocket();
     const [dialogOpen, setDialogOpen] = useState(false);
     const [notifications, setNotification] = useState([]);
 
-    useEffect(() => {
+    const reloadInvites = useCallback(() => {
       server.invites.list?.then(({ data }) => {
         setNotification(data?.invites ?? []);
       })
     }, [])
+
+    useEffect(() => {
+      socket.onInvite(reloadInvites);
+      reloadInvites();
+      return () => {
+        socket.offMessage(reloadInvites);
+      }
+    }, [reloadInvites, socket])
 
     const handleChangeDialogOpen = useCallback(() => {
       setDialogOpen(prev => !prev);
@@ -49,7 +59,8 @@ export default function withContainer<T>(Component: FunctionComponent<T>) {
     const handleSignOut = useCallback(() => {
       localStorage.clear();
       history.push('/');
-    }, [history])
+      socket.signin(undefined);
+    }, [history, socket])
 
     return (
       <div className={classes.container}>
@@ -57,7 +68,7 @@ export default function withContainer<T>(Component: FunctionComponent<T>) {
           <Toolbar className={classes.toolbar}>
             Valhalla Chat App
             <div>
-              <IconButton color="primary" onClick={handleChangeDialogOpen}>
+              {!!notifications.length && <IconButton color="primary" onClick={handleChangeDialogOpen}>
                 <Tooltip title="Invites">
                   <Badge badgeContent={notifications.length} color="error">
                     <Notifications className={classes.signout}>
@@ -65,7 +76,7 @@ export default function withContainer<T>(Component: FunctionComponent<T>) {
                     <Invites dialogOpen={dialogOpen} onClose={handleChangeDialogOpen} invites={notifications} />
                   </Badge>
                 </Tooltip>
-              </IconButton>
+              </IconButton>}
               <IconButton color="primary" onClick={handleSignOut}>
                 <Tooltip title="Sign out">
                   <ExitToApp className={classes.signout} />
@@ -81,7 +92,7 @@ export default function withContainer<T>(Component: FunctionComponent<T>) {
             <Component  {...props} />
           </Box>
         </div>
-      </div>
+      </div >
     )
   }
 }

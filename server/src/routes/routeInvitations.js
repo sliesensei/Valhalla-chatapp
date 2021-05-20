@@ -10,7 +10,7 @@ const routeInvitations = (app) => {
 		/**
 		 * List all invitations
 		 */
-		.get(getInvitations)
+		.get(auth, getInvitations)
 		/**
 		 * Invite an user
 		 * @param roomId

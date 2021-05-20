@@ -16,13 +16,14 @@ export function getConfirms(req, res) {
 }
 
 export function confirm(req, res) {
-	Confirmations.findOne({code: req.params.code}, (err, confirm) => {
+	Confirmations.findOne({ code: req.params.code }, (err, confirm) => {
 		if (!confirm) {
 			return res.status(400).send("Confirmation code not found.");
 		} else {
-			Users.findOneAndUpdate({_id: confirm.user}, {confirmed: true}, {},
+			Users.findOneAndUpdate({ _id: confirm.user }, { confirmed: true }, {},
 				(error, users) => {
 					if (error || users === null) {
+						console.error(error)
 						res.status(400).json(error);
 					} else {
 						confirm.delete();

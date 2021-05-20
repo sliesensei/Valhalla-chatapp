@@ -4,7 +4,7 @@ import {
 import auth from "../middleware/auth";
 
 const routeMessages = (app) => {
-	app.route('/room/messages')
+	app.route('/rooms/:roomId/messages')
 		/**
 		 * List Room's Messages
 		 * @param roomId

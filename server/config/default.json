@@ -1,4 +1,4 @@
 {
-	"DBHost": "mongodb://127.0.0.1:27017/valhalla-chatapp",
+	"DBHost": "mongodb+srv://Maastrich:accessValhalla@cluster0.0icm2.mongodb.net/test",
 	"JWT_SECRET": "oLe5za9SS7YAywcixgalscYT7lnekDoOGbF2CxBp"
 }

@@ -62,6 +62,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   message: {
     color: theme.palette.text.primary,
+    borderRadius: '8px 8px 8px 8px',
     '& div': {
       '& div': {
         backgroundColor: `${theme.palette.primary.main} !important`,

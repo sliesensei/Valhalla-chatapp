@@ -2,10 +2,8 @@ import {
   Button,
   Dialog,
   DialogActions,
-  DialogContent, DialogTitle, Divider, makeStyles, TextField, Theme, Typography
+  DialogContent, DialogTitle, makeStyles, Theme, Typography
 } from '@material-ui/core';
-import { useSnackbar } from 'notistack';
-import { ChangeEvent, useCallback, useDebugValue, useState } from 'react';
 import server from '../../sockets/useServer';
 
 interface Props {
@@ -40,12 +38,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export default function Invites({ dialogOpen, onClose, invites }: Props) {
   const classes = useStyles();
-  const { enqueueSnackbar } = useSnackbar();
-  const [inviteName, setInviteName] = useState('');
-
-  const handleChangeInviteName = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setInviteName(e.target.value)
-  }, [])
 
   return (
     <Dialog
@@ -59,7 +51,11 @@ export default function Invites({ dialogOpen, onClose, invites }: Props) {
         {invites.map((invite) =>
         (<div className={classes.contentSection}>
           <Typography variant="h5">You've  been invited to join {invite.roomName} by {invite.userName}</Typography>
-          <Button color="primary" variant="contained" onClick={() => { server.invites.accept(invite.token) }}>Join</Button>
+          <Button color="primary" variant="contained" onClick={() => {
+            server.invites.accept(invite.token).then(() => {
+              window.location.reload()
+            })
+          }}>Join</Button>
         </div>)
         )}
       </DialogContent>

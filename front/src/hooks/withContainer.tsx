@@ -71,8 +71,7 @@ export default function withContainer<T>(Component: FunctionComponent<T>) {
               {!!notifications.length && <IconButton color="primary" onClick={handleChangeDialogOpen}>
                 <Tooltip title="Invites">
                   <Badge badgeContent={notifications.length} color="error">
-                    <Notifications className={classes.signout}>
-                    </Notifications>
+                    <Notifications className={classes.signout} />
                     <Invites dialogOpen={dialogOpen} onClose={handleChangeDialogOpen} invites={notifications} />
                   </Badge>
                 </Tooltip>

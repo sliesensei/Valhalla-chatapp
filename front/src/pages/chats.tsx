@@ -85,7 +85,7 @@ function Chats() {
   const [currentChat, setCurrentChat] = useState<any>()
   const [filtered, setFiltered] = useState<Array<any>>([]);
   const [notifs, setNotifs] = useState<{ [k: string]: number }>({});
-  const history = useHistory();
+  const { enqueueSnackbar } = useSnackbar();
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const socket = useSocket();
   // const { enqueueSnackbar } = useSnackbar()
@@ -96,10 +96,6 @@ function Chats() {
     }
   }, [])
 
-  const handleSubmit = useCallback(() => {
-    const { roomName } = form;
-    if (roomName) server.rooms.create(roomName);
-  }, [form]);
 
   const handleChangeCurrentChat = useCallback((chat: any) => () => {
     setCurrentChat(chat);
@@ -110,11 +106,24 @@ function Chats() {
     setFiltered(newData);
   }, []);
 
-  useEffect(() => {
+  const refreshRoomList = useCallback(() => {
     server.rooms.getAll().then((res) => {
       setData(res.data)
     })
-  }, []);
+  }, [])
+
+  const handleSubmit = useCallback(() => {
+    const { roomName } = form;
+    if (roomName) server.rooms.create(roomName).then(({ data, variant }: any) => {
+      enqueueSnackbar(data?.message ?? 'Error', { variant })
+      refreshRoomList();
+    });
+    setDialogOpen(false);
+  }, [enqueueSnackbar, form, refreshRoomList]);
+
+  useEffect(() => {
+    refreshRoomList();
+  }, [refreshRoomList]);
 
   const handleAddNotif = useCallback((newMessage) => {
     console.log(newMessage)
@@ -143,53 +152,55 @@ function Chats() {
   }, [data]);
 
   return (
-    <MainContainer className={classes.container}>
-      <Sidebar loading={!data} position="left" className={classes.sidebar}>
-        <ConversationHeader className={classes.header}>
-          <ConversationHeader.Content>
-            <Searchbar
-              keys={['name']}
-              placeholder="Search for a conversation..."
-              onSearch={handleSearch}
-              data={data}
-            />
-          </ConversationHeader.Content>
-          <ConversationHeader.Actions className={classes.headerActions}>
-            <IconButton>
-              <AddOutlined color="primary" onClick={() => { setDialogOpen(prev => !prev) }} />
-              <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="xs" fullWidth>
-                <DialogTitle title="Sign In" className={classes.dialogTitle}>Create Room</DialogTitle>
-                <DialogContent className={classes.dialogContent}>
-                  <TextField fullWidth label="Room Name" name="roomName" onChange={handleChange} />
-                </DialogContent>
-                <DialogActions>
-                  <Button color="default" onClick={() => setDialogOpen(false)}>Cancel</Button>
-                  <Button color="primary" onClick={handleSubmit}>Create Room</Button>
-                </DialogActions>
-              </Dialog>
-            </IconButton>
-          </ConversationHeader.Actions>
-        </ConversationHeader>
-        <ConversationList>
-          {filtered.map((chat: any) => (
-            <ConversationPreview
-              unreadCnt={notifs[chat._id]}
-              onClick={handleChangeCurrentChat(chat)}
-              key={chat._id}
-              className={classes.conversationPreview}
-            >
-              <Avatar name={chat.name} status="available">
-                {chat.members.length > 2
-                  ? <SupervisedUserCircle fontSize="large" color="primary" />
-                  : <AccountCircle fontSize="large" color="primary" />}
-              </Avatar>
-              <ConversationPreview.Content name={chat.name} className={classes.conversationPreview} />
-            </ConversationPreview>
-          ))}
-        </ConversationList>
-      </Sidebar>
-      { currentChat && <Conversation chat={currentChat} />}
-    </MainContainer>
+    <>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle title="Sign In" className={classes.dialogTitle}>Create Room</DialogTitle>
+        <DialogContent className={classes.dialogContent}>
+          <TextField fullWidth label="Room Name" name="roomName" onChange={handleChange} />
+        </DialogContent>
+        <DialogActions>
+          <Button color="default" onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button color="primary" onClick={handleSubmit}>Create Room</Button>
+        </DialogActions>
+      </Dialog>
+      <MainContainer className={classes.container}>
+        <Sidebar loading={!data} position="left" className={classes.sidebar}>
+          <ConversationHeader className={classes.header}>
+            <ConversationHeader.Content>
+              <Searchbar
+                keys={['name']}
+                placeholder="Search for a conversation..."
+                onSearch={handleSearch}
+                data={data}
+              />
+            </ConversationHeader.Content>
+            <ConversationHeader.Actions className={classes.headerActions}>
+              <IconButton>
+                <AddOutlined color="primary" onClick={() => { setDialogOpen(prev => !prev) }} />
+              </IconButton>
+            </ConversationHeader.Actions>
+          </ConversationHeader>
+          <ConversationList>
+            {filtered.map((chat: any) => (
+              <ConversationPreview
+                unreadCnt={notifs[chat._id]}
+                onClick={handleChangeCurrentChat(chat)}
+                key={chat._id}
+                className={classes.conversationPreview}
+              >
+                <Avatar name={chat.name} status="available">
+                  {chat.members.length > 2
+                    ? <SupervisedUserCircle fontSize="large" color="primary" />
+                    : <AccountCircle fontSize="large" color="primary" />}
+                </Avatar>
+                <ConversationPreview.Content name={chat.name} className={classes.conversationPreview} />
+              </ConversationPreview>
+            ))}
+          </ConversationList>
+        </Sidebar>
+        {currentChat && <Conversation chat={currentChat} />}
+      </MainContainer>
+    </>
   )
 }
 

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import schemaRooms from "../models/modelRooms";
 import schemaUsers from "../models/modelUsers";
-import {error} from "../helpers";
+import { error } from "../helpers";
 
 const Rooms = mongoose.model('Rooms', schemaRooms);
 const Users = mongoose.model('Users', schemaUsers);
@@ -17,7 +17,7 @@ export async function getRooms(req, res) {
 }
 
 export async function getMyRooms(req, res) {
-	const rooms = await Rooms.find({$or: [{owner: req.user}, {members: req.user}]});
+	const rooms = await Rooms.find({ $or: [{ owner: req.user }, { members: req.user }] });
 	return res.status(201).json(rooms);
 }
 
@@ -33,7 +33,7 @@ export async function createRoom(req, res) {
 		if (err) {
 			return res.status(400).send(err);
 		}
-		return res.status(201).json(room);
+		return res.status(201).json({ message: 'Successfully created room', ...room });
 	})
 }
 
@@ -63,7 +63,7 @@ export async function leave(req, res) {
 	if (room.owner.toString() === req.user._id.toString() && room.members.length > 0) {
 		room.owner = room.members[0];
 	} else if (room.owner.toString() === req.user._id.toString() && room.members.length === 0) {
-		await Rooms.deleteOne({_id: req.body.roomId});
+		await Rooms.deleteOne({ _id: req.body.roomId });
 	}
-	return res.status(201).json({status: "Success"});
+	return res.status(201).json({ status: "Success" });
 }

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom"
-import { ThemeProvider } from '@material-ui/core';
+import { makeStyles, ThemeProvider } from '@material-ui/core';
 import './App.css';
 import home from './pages/home';
 import themeLight from './themes/themeLight';
@@ -13,10 +13,22 @@ import chats from './pages/chats';
 import Reset from './pages/reset';
 import ResetPassword from './pages/passwordReset';
 
+const useStyles = makeStyles({
+  success: {
+    backgroundColor: "#00c687"
+  }
+})
+
 function App() {
   const { currentTheme } = useContext(GlobalContext)
+  const classes = useStyles();
   return (
-    <SnackbarProvider maxSnack={3}>
+    <SnackbarProvider anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'center'
+    }} classes={{
+      variantSuccess: classes.success
+    }} maxSnack={3}>
       <ThemeProvider theme={currentTheme === 'light' ? themeLight : themeDark}>
         <BrowserRouter>
           <Switch>
